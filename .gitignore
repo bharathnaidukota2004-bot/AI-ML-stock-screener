@@ -1,0 +1,46 @@
+# Stock Screener .gitignore
+# Never commit credentials or virtual environments!
+
+# Environment & credentials
+.env
+config/credentials.json
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+*.spec
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Reports output (optional — remove this line if you want to track PDFs)
+reports/*.pdf
+
+# Data history cache
+data/history/
+
+# Trades log (regenerated each session)
+trades_log.json
+
+# PyInstaller
+*.manifest
+*.exe
+
+# Misc
+.DS_Store
+Thumbs.db
+*.log
