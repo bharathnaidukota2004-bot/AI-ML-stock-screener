@@ -36,6 +36,15 @@ from ui.sparklines import SparklineStore
 from ui.sector_heatmap import SectorHeatmap
 from reports.pdf_generator import ReportGenerator
 
+# ── Quantitative & MLOps Dashboard Tabs ─────────────────────────────────────
+from ui.tab_indicators import IndicatorsTab
+from ui.tab_evaluation import EvaluationTab
+from ui.tab_backtesting import BacktestingTab
+from ui.tab_risk import RiskTab
+from ui.tab_mlflow import MLflowTab
+from ui.tab_monitoring import MonitoringTab
+from mlops.monitoring import ModelMonitor
+
 ctk.set_appearance_mode("Dark")
 ctk.set_default_color_theme("blue")
 
@@ -48,8 +57,9 @@ class StockScreenerApp(ctk.CTk):
         self.geometry("1500x950")
 
         self.credentials = load_credentials()
+        self.monitor = ModelMonitor()
         self.ai_evaluator = AICrossoverEvaluator()
-        self.paper_trader = PaperTrader()
+        self.paper_trader = PaperTrader(monitor=self.monitor)
 
         # ── New feature instances ────────────────────────────────────────────
         self.telegram_alerter = TelegramAlerter()
@@ -121,13 +131,35 @@ class StockScreenerApp(ctk.CTk):
         self.tabview = ctk.CTkTabview(self, fg_color="#181825", segmented_button_selected_color="#89B4FA")
         self.tabview.pack(fill="both", expand=True, padx=15, pady=5)
 
-        self.tab_screener    = self.tabview.add("📈 Live 1-Min Screener")
-        self.tab_training    = self.tabview.add("🤖 Day 1 ML Training & Features")
-        self.tab_papertrade  = self.tabview.add("📊 Live Paper Trading & Win/Loss Stats")
+        # 1. Stock Screener
+        self.tab_screener    = self.tabview.add("📈 Stock Screener")
+        # 2. Technical Indicators
+        self.tab_indicators  = self.tabview.add("📐 Technical Indicators")
+        # 3. ML Model Evaluation
+        self.tab_evaluation  = self.tabview.add("🤖 ML Model Evaluation")
+        # 4. Backtesting
+        self.tab_backtesting = self.tabview.add("🧪 Backtesting")
+        # 5. Risk Analytics
+        self.tab_risk        = self.tabview.add("📊 Risk Analytics")
+        # 6. Experiment Tracking
+        self.tab_mlflow      = self.tabview.add("🔬 Experiment Tracking")
+        # 7. Model Monitoring
+        self.tab_monitoring  = self.tabview.add("📡 Model Monitoring")
+
+        # Additional Core Quantitative Workflows
+        self.tab_training    = self.tabview.add("⚙️ Day 1 Trainer")
+        self.tab_papertrade  = self.tabview.add("💼 Paper Trading")
         self.tab_heatmap     = self.tabview.add("🗺️ Sector Heatmap")
         self.tab_reports     = self.tabview.add("📄 Reports & Alerts")
 
+        # Initialize Tabs
         self._build_screener_tab()
+        self.indicators_view = IndicatorsTab(self.tab_indicators, self)
+        self.evaluation_view = EvaluationTab(self.tab_evaluation, self)
+        self.backtesting_view = BacktestingTab(self.tab_backtesting, self)
+        self.risk_view = RiskTab(self.tab_risk, self)
+        self.mlflow_view = MLflowTab(self.tab_mlflow, self)
+        self.monitoring_view = MonitoringTab(self.tab_monitoring, self)
         self._build_training_tab()
         self._build_papertrade_tab()
         self._build_heatmap_tab()

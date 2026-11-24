@@ -40,6 +40,19 @@ trades_log.json
 *.manifest
 *.exe
 
+# MLflow & Models
+mlruns/
+data/mlflow.db*
+models/backup/
+models/archive/
+
+# Media & zip archives
+*.zip
+*.mp4
+*.gif
+*.webp
+*.lnk
+
 # Misc
 .DS_Store
 Thumbs.db

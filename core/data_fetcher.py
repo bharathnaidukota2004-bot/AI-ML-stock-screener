@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from datetime import datetime, timedelta
 from config.settings import ACTIVE_NSE_TICKERS, SMMA_FAST_PERIOD, SMMA_SLOW_PERIOD
-from core.indicators import calculate_smma_series
+from core.indicators import calculate_smma_series, add_technical_indicators
 
 def fetch_stock_1min_data(ticker="TATASTEEL.NS", period_days=5):
     """
@@ -107,7 +107,9 @@ def generate_synthetic_1min_data(ticker="TATASTEEL.NS", days=3):
 
 def prepare_dataset_with_indicators(df):
     """
-    Computes 20 SMMA, 120 SMMA, LTQ Ratio, Volume Surges, and Depth Imbalance for 1-min data.
+    Computes 20 SMMA, 120 SMMA, LTQ Ratio, Volume Surges, Depth Imbalance,
+    and Advanced Technical Indicators (RSI, MACD, Bollinger Bands, EMA, ATR) for 1-min data.
+    Strict chronological order, no future data leakage.
     """
     df = df.copy()
     df['SMMA_20'] = calculate_smma_series(df['Close'], SMMA_FAST_PERIOD)
@@ -125,8 +127,10 @@ def prepare_dataset_with_indicators(df):
     df['Price_Dev_20m'] = (df['Close'] - df['Close'].rolling(window=20, min_periods=1).mean()) / (df['Close'] + 1e-5)
     
     # Order Book Depth Imbalance (Synthetic/Historical feature modeling)
-    # Models bid depth vs ask depth based on candle direction & volume
     synthetic_imbalance = np.clip((df['Close'] - df['Open']) / (df['High'] - df['Low'] + 1e-5), -0.8, 0.8)
     df['Depth_Imbalance'] = synthetic_imbalance
+    
+    # Add Advanced Technical Indicators
+    df = add_technical_indicators(df)
     
     return df.dropna().reset_index(drop=True)

@@ -2,9 +2,10 @@ import os
 import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, precision_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from core.data_fetcher import fetch_stock_1min_data, prepare_dataset_with_indicators
 from config.settings import ACTIVE_NSE_TICKERS
+from mlops.mlflow_tracker import MLflowExperimentTracker
 
 class Day1MLTrainer:
     """
@@ -107,6 +108,8 @@ class Day1MLTrainer:
         y_pred = self.model.predict(X)
         acc = accuracy_score(y, y_pred) * 100
         prec = precision_score(y, y_pred, zero_division=0) * 100
+        rec = recall_score(y, y_pred, zero_division=0) * 100
+        f1 = f1_score(y, y_pred, zero_division=0) * 100
         
         importances = dict(zip(self.feature_names, self.model.feature_importances_))
         
@@ -116,8 +119,24 @@ class Day1MLTrainer:
             'losing_crossovers': total_crossovers - winning_crossovers,
             'accuracy': round(acc, 1),
             'precision': round(prec, 1),
+            'recall': round(rec, 1),
+            'f1_score': round(f1, 1),
             'feature_importances': importances
         }
+
+        # Track experiment run in MLflow & Model Registry
+        try:
+            tracker = MLflowExperimentTracker()
+            tracker.log_experiment_run(
+                model=self.model,
+                model_name="Random Forest",
+                params={'n_estimators': 100, 'max_depth': 6, 'random_state': 42},
+                metrics={'accuracy': acc, 'precision': prec, 'recall': rec, 'f1_score': f1},
+                dataset_info={'total_samples': len(X), 'tickers': tickers[:4], 'timeframe': '1m'},
+                features_list=self.feature_names
+            )
+        except Exception as e:
+            print(f"[Day1MLTrainer] MLflow tracking note: {e}")
         
         print(f"[Day1MLTrainer] Model trained successfully on {total_crossovers} crossovers. Day 1 Accuracy: {acc:.1f}%")
         return self.training_summary

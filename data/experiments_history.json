@@ -1,0 +1,89 @@
+[
+  {
+    "run_id": "random_forest_v_20261124_215944",
+    "mlflow_run_id": null,
+    "model_name": "Random Forest",
+    "version": "v_20261124_215944",
+    "timestamp": "2026-11-24 21:59:44",
+    "parameters": {
+      "n_estimators": 10,
+      "max_depth": 3
+    },
+    "metrics": {
+      "accuracy": 85.0,
+      "precision": 80.0,
+      "f1_score": 82.5
+    },
+    "dataset_info": {
+      "samples": 20
+    },
+    "features": [
+      "f1",
+      "f2",
+      "f3",
+      "f4",
+      "f5",
+      "f6"
+    ],
+    "artifact_path": "C:\\Users\\mail\\OneDrive\\Desktop\\STOCK-PROJECT\\models\\archive\\random_forest_v_20261124_215944.joblib",
+    "active_path": "C:\\Users\\mail\\OneDrive\\Desktop\\STOCK-PROJECT\\models\\active\\random_forest.joblib"
+  },
+  {
+    "run_id": "random_forest_v_20261124_220123",
+    "mlflow_run_id": null,
+    "model_name": "Random Forest",
+    "version": "v_20261124_220123",
+    "timestamp": "2026-11-24 22:01:30",
+    "parameters": {
+      "n_estimators": 10,
+      "max_depth": 3
+    },
+    "metrics": {
+      "accuracy": 85.0,
+      "precision": 80.0,
+      "f1_score": 82.5
+    },
+    "dataset_info": {
+      "samples": 20
+    },
+    "features": [
+      "f1",
+      "f2",
+      "f3",
+      "f4",
+      "f5",
+      "f6"
+    ],
+    "artifact_path": "C:\\Users\\mail\\OneDrive\\Desktop\\STOCK-PROJECT\\models\\archive\\random_forest_v_20261124_220123.joblib",
+    "active_path": "C:\\Users\\mail\\OneDrive\\Desktop\\STOCK-PROJECT\\models\\active\\random_forest.joblib"
+  },
+  {
+    "run_id": "random_forest_v_20261124_220330",
+    "mlflow_run_id": "60ca4e6f816e4c5985c9676bb2d1a57d",
+    "model_name": "Random Forest",
+    "version": "v_20261124_220330",
+    "timestamp": "2026-11-24 22:04:06",
+    "parameters": {
+      "n_estimators": 10,
+      "max_depth": 3
+    },
+    "metrics": {
+      "accuracy": 85.0,
+      "precision": 80.0,
+      "f1_score": 82.5
+    },
+    "dataset_info": {
+      "samples": 20
+    },
+    "features": [
+      "f1",
+      "f2",
+      "f3",
+      "f4",
+      "f5",
+      "f6"
+    ],
+    "artifact_path": "C:\\Users\\mail\\OneDrive\\Desktop\\STOCK-PROJECT\\models\\archive\\random_forest_v_20261124_220330.joblib",
+    "active_path": "C:\\Users\\mail\\OneDrive\\Desktop\\STOCK-PROJECT\\models\\active\\random_forest.joblib"
+  }
+]

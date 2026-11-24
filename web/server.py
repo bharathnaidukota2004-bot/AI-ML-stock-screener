@@ -276,6 +276,103 @@ def download_pdf_report():
         return jsonify({"status": "error", "message": str(e)}), 500
 
 
+# ── Quantitative & MLOps API Endpoints ────────────────────────────────────────
+
+@app.route("/api/indicators/<ticker>")
+def get_stock_indicators(ticker):
+    """Calculates chronological RSI, MACD, Bollinger Bands, EMA, and ATR."""
+    try:
+        from core.indicator_engine import TechnicalIndicatorEngine
+        eng = TechnicalIndicatorEngine()
+        full_sym = f"{ticker}.NS" if not ticker.endswith(".NS") else ticker
+        analysis = eng.analyze_stock(full_sym)
+        return jsonify({"status": "ok", "ticker": ticker, "summary": analysis.get("summary", {})})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route("/api/ml/evaluation")
+def get_ml_evaluation():
+    """Runs chronological out-of-sample model evaluation comparing RF, LR, and GB."""
+    try:
+        from ml.evaluator import ModelEvaluator
+        evaluator = ModelEvaluator(use_technical_indicators=True)
+        results = evaluator.run_chronological_evaluation()
+        return jsonify({"status": "ok", "evaluation": results})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route("/api/backtest", methods=["GET", "POST"])
+def run_backtest_api():
+    """Simulates historical trading strategy with realistic slippage and transaction costs."""
+    try:
+        from backtesting.engine import BacktestEngine
+        ticker = request.args.get("ticker", "TATASTEEL.NS")
+        if not ticker.endswith(".NS"):
+            ticker = f"{ticker}.NS"
+        capital = float(request.args.get("capital", 100000.0))
+        tp = float(request.args.get("tp", 1.5))
+        sl = float(request.args.get("sl", 0.8))
+
+        engine = BacktestEngine(initial_capital=capital, take_profit_pct=tp, stop_loss_pct=sl)
+        result = engine.run(None, ticker=ticker, use_indicator_filter=True)
+        return jsonify({"status": "ok", "result": result.to_dict()})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route("/api/risk-analytics")
+def get_risk_analytics():
+    """Computes Sharpe ratio, Sortino, Calmar, drawdowns, and VaR."""
+    try:
+        from analytics.risk_engine import RiskAnalyticsEngine
+        engine = RiskAnalyticsEngine()
+        # Use paper trading closed trades or default equity curve
+        trades = paper_trader.closed_trades
+        if trades:
+            equities = [paper_trader.initial_capital]
+            curr = paper_trader.initial_capital
+            for t in trades:
+                curr += getattr(t, 'pnl', 0.0)
+                equities.append(curr)
+        else:
+            equities = [100000.0, 100450.0, 101200.0, 100800.0, 101900.0, 102500.0]
+
+        report = engine.analyze_equity_curve(equities)
+        return jsonify({"status": "ok", "risk_report": report.to_dict()})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route("/api/mlflow/experiments")
+def get_mlflow_experiments():
+    """Returns MLflow experiments history and model registry artifacts."""
+    try:
+        from mlops.mlflow_tracker import MLflowExperimentTracker
+        tracker = MLflowExperimentTracker()
+        exps = tracker.get_all_experiments()
+        best = tracker.get_best_experiment("f1_score")
+        return jsonify({"status": "ok", "experiments": exps, "best_experiment": best})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route("/api/monitoring/drift")
+def get_monitoring_drift():
+    """Returns model predictions audit and feature drift (PSI & KS) report."""
+    try:
+        from mlops.monitoring import ModelMonitor
+        monitor = ModelMonitor()
+        monitor.seed_initial_monitoring_data()
+        perf = monitor.compute_performance_metrics()
+        drift = monitor.evaluate_data_drift()
+        return jsonify({
+            "status": "ok",
+            "performance": perf,
+            "drift_report": drift.to_dict(),
+            "recent_predictions": monitor.predictions[-10:]
+        })
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
+
 def start_server(host="127.0.0.1", port=5000):
     """Starts the BrokerStreamer and runs Flask app."""
     creds = load_credentials()

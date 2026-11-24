@@ -8,13 +8,15 @@ class PaperTrader:
     2. Dynamically monitors active positions for Target Profit (+1.5%) & Stop Loss (-0.8%).
     3. Maintains stats: Win Rate %, Loss Rate %, Avoided Trades %, Net PnL.
     4. Logs explicit reasons for trade avoidances.
+    5. Feeds trade execution outcomes into MLOps ModelMonitor for live drift & accuracy tracking.
     """
-    def __init__(self, initial_capital=INITIAL_PAPER_CAPITAL):
+    def __init__(self, initial_capital=INITIAL_PAPER_CAPITAL, monitor=None):
         self.initial_capital = initial_capital
         self.capital = initial_capital
         self.active_positions = {}  # symbol -> position dict
         self.closed_trades = []
         self.avoided_trades = []
+        self.monitor = monitor
 
     def process_signal(self, symbol, signal_type, ltp, eval_res):
         """
@@ -50,7 +52,9 @@ class PaperTrader:
             target_price = round(ltp * (1.0 - TARGET_PROFIT_PCT / 100.0), 2)
             stop_loss = round(ltp * (1.0 + STOP_LOSS_PCT / 100.0), 2)
 
+        pred_id = f"pos_{symbol}_{int(time.time())}"
         position = {
+            'pred_id': pred_id,
             'symbol': symbol,
             'signal_type': signal_type,
             'entry_time': timestamp,
@@ -62,6 +66,19 @@ class PaperTrader:
             'current_price': ltp,
             'pnl': 0.0
         }
+
+        if self.monitor:
+            try:
+                self.monitor.log_prediction(
+                    pred_id=pred_id,
+                    ticker=symbol,
+                    model_name="Random Forest",
+                    features=eval_res.get('features', {}),
+                    predicted_label=1,
+                    predicted_probability=eval_res.get('probability', 50.0)
+                )
+            except Exception:
+                pass
 
         self.active_positions[symbol] = position
         return {'action': 'OPENED', 'position': position}
@@ -99,6 +116,20 @@ class PaperTrader:
         
         self.capital += pos['pnl']
         self.closed_trades.append(pos)
+
+        # Notify ModelMonitor to resolve outcome
+        if self.monitor and 'pred_id' in pos:
+            try:
+                act_label = 1 if "SUCCESS" in status else 0
+                ret_pct = (
+                    ((exit_price - pos['entry_price']) / pos['entry_price'] * 100.0)
+                    if pos['signal_type'] == "BUY"
+                    else ((pos['entry_price'] - exit_price) / pos['entry_price'] * 100.0)
+                )
+                self.monitor.record_actual_outcome(pos['pred_id'], act_label, ret_pct, status)
+            except Exception:
+                pass
+
         return pos
 
     def get_statistics(self):
