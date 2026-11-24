@@ -13,7 +13,7 @@
     "actual_label": 1,
     "actual_return_pct": 1.5,
     "exit_reason": "TARGET_HIT",
-    "resolved_timestamp": "2026-11-24 22:04:07",
+    "resolved_timestamp": "2026-11-24 22:15:21",
     "status": "RESOLVED"
   },
   {
@@ -36,6 +36,23 @@
   {
     "pred_id": "test_pred_001",
     "timestamp": "2026-11-24 22:04:07",
+    "ticker": "TATASTEEL",
+    "model_name": "Random Forest",
+    "features": {
+      "ltq": 1.2,
+      "rsi": 0.55
+    },
+    "predicted_label": 1,
+    "predicted_probability": 75.0,
+    "actual_label": null,
+    "actual_return_pct": null,
+    "exit_reason": null,
+    "resolved_timestamp": null,
+    "status": "PENDING_OUTCOME"
+  },
+  {
+    "pred_id": "test_pred_001",
+    "timestamp": "2026-11-24 22:15:21",
     "ticker": "TATASTEEL",
     "model_name": "Random Forest",
     "features": {

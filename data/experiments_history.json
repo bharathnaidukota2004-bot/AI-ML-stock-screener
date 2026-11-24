@@ -85,5 +85,34 @@
     ],
     "artifact_path": "C:\\Users\\mail\\OneDrive\\Desktop\\STOCK-PROJECT\\models\\archive\\random_forest_v_20261124_220330.joblib",
     "active_path": "C:\\Users\\mail\\OneDrive\\Desktop\\STOCK-PROJECT\\models\\active\\random_forest.joblib"
+  },
+  {
+    "run_id": "random_forest_v_20261124_221446",
+    "mlflow_run_id": "37818bfe3eec4812bef162b6770cf9c1",
+    "model_name": "Random Forest",
+    "version": "v_20261124_221446",
+    "timestamp": "2026-11-24 22:15:21",
+    "parameters": {
+      "n_estimators": 10,
+      "max_depth": 3
+    },
+    "metrics": {
+      "accuracy": 85.0,
+      "precision": 80.0,
+      "f1_score": 82.5
+    },
+    "dataset_info": {
+      "samples": 20
+    },
+    "features": [
+      "f1",
+      "f2",
+      "f3",
+      "f4",
+      "f5",
+      "f6"
+    ],
+    "artifact_path": "C:\\Users\\mail\\OneDrive\\Desktop\\STOCK-PROJECT\\models\\archive\\random_forest_v_20261124_221446.joblib",
+    "active_path": "C:\\Users\\mail\\OneDrive\\Desktop\\STOCK-PROJECT\\models\\active\\random_forest.joblib"
   }
 ]
